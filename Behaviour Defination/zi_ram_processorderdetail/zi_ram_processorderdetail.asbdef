@@ -1,0 +1,18 @@
+managed implementation in class zbp_i_ram_processorderdetail unique;
+
+define behavior for Zi_Ram_ProcessOrderDetail
+with unmanaged save
+//alias <alias_name>
+//persistent table <???>
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  //  create;
+  //  update;
+  //  delete;
+
+  action UpdateCostingVariant parameter ZA_RAm_Actual_cost_var result [1] $self;
+
+
+}

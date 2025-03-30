@@ -1,0 +1,60 @@
+CLASS zcl_ram_read_text DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_sadl_exit .
+    INTERFACES if_sadl_exit_calc_element_read .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_ram_read_text IMPLEMENTATION.
+  METHOD if_sadl_exit_calc_element_read~calculate.
+
+    DATA lt_process_order TYPE STANDARD TABLE OF zc_ram_processorderdetail.
+    DATA lv_txtname       TYPE tdobname.
+    DATA lt_lines         TYPE STANDARD TABLE OF tline.
+
+    CHECK it_original_data IS NOT INITIAL.
+    lt_process_order = CORRESPONDING #( it_original_data ).
+
+    LOOP AT lt_process_order ASSIGNING FIELD-SYMBOL(<ls_process_order>).
+
+      CONCATENATE sy-mandt <ls_process_order>-aufnr INTO lv_txtname.
+*      <ls_process_order>-ltext = 'TEMP'.
+      CALL FUNCTION 'READ_TEXT'
+        EXPORTING  client                  = sy-mandt
+                   id                      = 'KOPF'
+                   language                = sy-langu
+                   name                    = lv_txtname
+                   object                  = 'AUFK'
+        TABLES     lines                   = lt_lines
+        EXCEPTIONS id                      = 1
+                   language                = 2
+                   name                    = 3
+                   not_found               = 4
+                   object                  = 5
+                   reference_check         = 6
+                   wrong_access_to_archive = 7
+                   OTHERS                  = 8.
+      IF sy-subrc = 0.
+        LOOP AT lt_lines INTO DATA(lwa_lines).
+          CONCATENATE <ls_process_order>-ltext lwa_lines-tdline INTO <ls_process_order>-ltext.
+        ENDLOOP.
+      ENDIF.
+
+    ENDLOOP.
+    ct_calculated_data = CORRESPONDING #( lt_process_order ).
+
+  ENDMETHOD.
+
+  METHOD if_sadl_exit_calc_element_read~get_calculation_info.
+
+  ENDMETHOD.
+
+ENDCLASS.

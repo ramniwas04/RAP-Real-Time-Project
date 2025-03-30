@@ -1,0 +1,7 @@
+projection;
+
+define behavior for ZC_Ram_ProcessOrderDetail //alias <alias_name>
+{
+
+  use action UpdateCostingVariant;
+}

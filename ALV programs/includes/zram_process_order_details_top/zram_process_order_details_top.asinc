@@ -1,0 +1,407 @@
+*&---------------------------------------------------------------------*
+*& Include zram_process_order_details_top
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*    Type Declarations
+*&---------------------------------------------------------------------*
+
+" Type declaration for AFVC table
+TYPES: BEGIN OF ty_afvc,
+         aufpl TYPE co_aufpl,   " Routing number of operations in the order
+         aplzl TYPE co_aplzl,   " Counter
+         vornr TYPE vornr,      " Operation/Activity Number " "
+         arbid TYPE cr_objid,   " Resource
+         werks TYPE werks_d,    " Plant
+         objnr TYPE j_objnr,    " Object number
+         phflg TYPE phflg,      " Indicator: Phase
+         pvzkn TYPE afvc-pvzkn, " Added by VERMAA02
+       END OF ty_afvc.
+" Type declaration for AFVV table
+
+TYPES: BEGIN OF ty_afvv,
+         aufpl TYPE co_aufpl, " Routing number of operations in the order
+         aplzl TYPE co_aplzl, " Counter
+         fsavd TYPE fsavd,    " Scheduled start Date
+         fsavz TYPE fsavz,    " Scheduled start time
+       END OF ty_afvv.
+" Type declaration for AFKO table
+TYPES: BEGIN OF ty_afko,
+         aufnr    TYPE aufnr,    " Process Order Number
+         gstrs    TYPE co_gstrs, " Scheduled start date
+         gltrs    TYPE co_gltrs, " Scheduled finish date
+         rsnum    TYPE rsnum,    " Number of reservation   " I-HELK920710
+         gamng    TYPE gamng,    " Material
+         gmein    TYPE meins,    " Qty
+         plnbez   TYPE matnr,    " UOM
+         aufpl    TYPE co_aufpl, " Routing number of operations in the order
+         aprio    TYPE co_aprio, " Order Priority
+         gluzs    TYPE co_gluzs, " Scheduled finish time
+         gsuzs    TYPE co_gsuzs, " Scheduled start time
+         cy_seqnr TYPE cy_seqnr, " Seq. number order
+         stlal    TYPE stalt,    " Alternative BOM
+       END OF ty_afko.
+
+" Type declaration for AUFK table
+TYPES: BEGIN OF ty_aufk,
+         aufnr TYPE aufnr,   " Process Order Number
+*       ktext TYPE auftext,        " Material description
+         objnr TYPE j_objnr, " Object Number
+
+       END OF ty_aufk.
+
+" Type declaration for AFPO table
+TYPES: BEGIN OF ty_afpo,
+         aufnr TYPE aufnr,      " process Order Number
+         psmng TYPE afpo-psmng,
+         wemng TYPE co_wemng,   " Delivery quantity
+         amein TYPE afpo-amein,
+         meins TYPE afpo-meins,
+         verid TYPE verid,      " Version
+         ablad TYPE ablad,      " Unloading Point
+         charg TYPE charg_d,    " Batch number
+       END OF ty_afpo.
+
+TYPES: BEGIN OF ty_makt,
+         matnr TYPE matnr,
+         maktx TYPE maktx,
+       END OF ty_makt.
+
+TYPES: BEGIN OF ty_aufm,
+         budat TYPE aufm-budat,
+         bwart TYPE bwart,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
+         charg TYPE charg_d,
+         aufnr TYPE aufnr,
+       END OF ty_aufm.
+
+TYPES: BEGIN OF ty_mseg,
+         bwart TYPE bwart,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
+         charg TYPE charg_d,
+         menge TYPE menge_d,
+         meins TYPE meins,
+         aufnr TYPE aufnr,
+       END OF ty_mseg.
+
+TYPES: BEGIN OF ty_resb,
+         rsnum TYPE resb-rsnum,
+         rspos TYPE resb-rspos,
+         rsart TYPE resb-rsart,
+         matnr TYPE resb-matnr,
+         bdmng TYPE resb-bdmng,
+       END OF ty_resb.
+
+" Type declaration for JEST table
+TYPES: BEGIN OF ty_jest,
+         objnr TYPE j_objnr,  " Object Number
+         stat  TYPE j_status, " Status
+       END OF ty_jest.
+
+" Type declaration for TJ02T table
+TYPES: BEGIN OF ty_tj02t,
+         istat TYPE j_istat, " Status
+         txt30 TYPE j_txt30, " Status Desc
+       END OF ty_tj02t.
+
+" Type declaration for CRHD table
+TYPES: BEGIN OF ty_crhd,
+         objid TYPE cr_objid, " Object Number
+         arbpl TYPE arbpl,    " Resource
+         werks TYPE werks_d,  " Plant
+         prvbe TYPE prvbe,    " Supple Area "
+       END OF ty_crhd.
+
+TYPES: BEGIN OF ty_pcmp,
+         aufnr TYPE aufnr, " Process order number
+         pcmnr TYPE pcmnr, " campaign
+         pctxt TYPE pctxt, " description
+       END OF ty_pcmp.
+
+" Type declaration for ALV internal table
+TYPES: BEGIN OF ty_final,
+         arbpl      TYPE arbpl,        " Resource
+         prvbe      TYPE prvbe,        " Supply Area
+         gstrs      TYPE co_gstrs,     " Scheduled start date
+         gsuzs      TYPE co_gsuzs,     " Scheduled start time
+         gltrs      TYPE co_gltrs,     " Scheduled start date
+         gluzs      TYPE co_gluzs,     " Scheduled start time
+         pcmnr      TYPE pcmnr,        " Campaign Number
+         pctxt      TYPE pctxt,        " campaign text
+         aufnr      TYPE aufnr,        " Order
+         vornr      TYPE vornr,        " Operation/Activity Number
+         werks      TYPE werks_d,      " Plant
+         ablad      TYPE ablad,        " Unloading Point
+         plnbez     TYPE matnr,        " Material number
+         ktext      TYPE auftext,      " Material Description
+         charg      TYPE charg_d,      " Batch number
+         gamng      TYPE gamng,        " Order Qty
+         wemng      TYPE co_wemng,     " Delivery quantity
+         gmein      TYPE meins,        " UOM
+         psmng_b    TYPE afpo-psmng,   " I-HELK928333
+         wemng_b    TYPE co_wemng,     " I-HELK928333
+         meins_b    TYPE afpo-meins,   " I-HELK928333
+         verid      TYPE verid,        " Version Id
+         txt30      TYPE c LENGTH 500, " Status Desc
+         status     TYPE c LENGTH 500, " TO Status
+
+         seqnr      TYPE cy_seqnr,     " Sequence No.
+         aprio      TYPE co_aprio,     " Priority
+         ltext      TYPE string,       " Long Text for PO
+         scrap_qty  TYPE menge_d,      " Scrap Qty
+         scrap_uom  TYPE meins,        " Scrap UOM
+
+         sfcpf      TYPE co_prodprf,   " Prod Scheduling profile
+         prodprf_tx TYPE prodprf_tx,   " Prod profile description
+         t_color    TYPE lvc_t_scol,   " ALV Line color settting
+         bulk_matnr TYPE c LENGTH 18,  " matnr,        " Bulk Material
+         bulk_maktx TYPE auftext,      " Bulk Description I-HELK920710
+         labor      TYPE labor,        " Cntrl Prod
+         zprint     TYPE c LENGTH 1,   ""Pick List Print Flag
+
+         budat      TYPE aufm-budat,
+         stlal      TYPE afko-stlal,
+
+         fevor      TYPE marc-fevor,
+
+       END OF ty_final.
+
+TYPES: BEGIN OF ty_caufv,
+         aufnr  TYPE aufnr,
+         werks  TYPE werks_d,
+         plnbez TYPE matnr,
+
+         stlnr  TYPE stnum,
+         saenr  TYPE aennr,
+         stlal  TYPE stalt,
+
+         sfcpf  TYPE co_prodprf,
+       END OF ty_caufv.
+
+TYPES: BEGIN OF ty_ltak,
+         kquit TYPE ltak_kquit,
+*        benum TYPE lvs_benum,
+         lznum TYPE lvs_lznum,
+         druck TYPE ltak_druck,
+       END OF ty_ltak.
+
+TYPES: BEGIN OF ty_tco43t,
+         co_prodprf TYPE co_prodprf,
+         prodprf_tx TYPE prodprf_tx,
+       END OF ty_tco43t.
+
+TYPES: BEGIN OF ty_tvarvc,
+         low TYPE rvari_val_255,
+       END OF ty_tvarvc.
+
+TYPES: BEGIN OF ty_mara,
+         matnr TYPE matnr,
+         mtart TYPE mtart,
+       END OF ty_mara.
+
+TYPES: BEGIN OF ty_error,
+         error TYPE c LENGTH 256,
+       END OF ty_error.
+
+DATA lt_error     TYPE TABLE OF ty_error.
+
+*>> End of change by KOTALN01 on 22/03/2022
+*&---------------------------------------------------------------------*
+*    Internal Table Declarations
+*&---------------------------------------------------------------------*
+DATA it_afvc      TYPE TABLE OF ty_afvc.                 " internal table for AFVC
+DATA it_afvv      TYPE TABLE OF ty_afvv.                 " internal table for AFKO
+DATA it_afko      TYPE TABLE OF ty_afko.                 " internal table for AFKO
+DATA it_aufk      TYPE TABLE OF ty_aufk.                 " internal table for AUFK
+DATA it_afpo      TYPE TABLE OF ty_afpo.                 " internal table for AFPO
+DATA it_jest      TYPE TABLE OF ty_jest.                 " internal table for JEST
+DATA it_tj02t     TYPE TABLE OF ty_tj02t.                 " internal table for TJ02T
+DATA it_crhd      TYPE TABLE OF ty_crhd.                 " internal table for CRHD
+DATA it_final     TYPE TABLE OF ty_final.                 " internal table for Final
+DATA it_final_c   TYPE TABLE OF ty_final.                 " internal table for Final  "
+DATA it_makt      TYPE TABLE OF ty_makt.                 " internal table for MAKT
+DATA it_aufm      TYPE TABLE OF ty_aufm.                 " internal table for AUFM
+DATA it_mseg      TYPE TABLE OF ty_mseg.                 " internal table for MSEG
+DATA it_pcmp      TYPE TABLE OF ty_pcmp.                 " campaign data for pcmp/pcmh
+
+DATA it_caufv     TYPE TABLE OF ty_caufv.
+DATA it_ltak      TYPE TABLE OF ty_ltak.
+DATA it_tco43t    TYPE TABLE OF ty_tco43t.
+DATA it_tvarvc    TYPE TABLE OF ty_tvarvc.
+
+DATA it_resb      TYPE TABLE OF ty_resb.
+DATA it_resb_makt TYPE TABLE OF ty_makt.
+DATA it_mara      TYPE TABLE OF ty_mara.
+
+*&---------------------------------------------------------------------*
+*    Work Area Declarations
+*&---------------------------------------------------------------------*
+
+DATA gwa_final    TYPE ty_final.     " Work area for final
+DATA gwa_crhd     TYPE ty_crhd.      " Work area for CRHD
+DATA gwa_tj02t    TYPE ty_tj02t.     " Work area for TJ02T
+DATA gwa_jest     TYPE ty_jest.      " Work area for JEST
+DATA gwa_afpo     TYPE ty_afpo.      " Work area for AFPO
+DATA gwa_aufk     TYPE ty_aufk.      " Work area for AUFK
+DATA gwa_afko     TYPE ty_afko.      " Work area for AFKo
+DATA gwa_afvv     TYPE ty_afvv.      " Work area for AFVV
+DATA gwa_afvc     TYPE ty_afvc.      " Work area for AFVC
+DATA gwa_makt     TYPE ty_makt.      " Work area for MAKT
+DATA gwa_mseg     TYPE ty_mseg.      " Work area for MSEG
+DATA gwa_pcmp     TYPE ty_pcmp.
+
+DATA gwa_caufv    TYPE ty_caufv.
+DATA gwa_ltak     TYPE ty_ltak.
+DATA gwa_tco43t   TYPE ty_tco43t.
+DATA gwa_tvarvc   TYPE ty_tvarvc.
+
+DATA gwa_mara     TYPE ty_mara.
+*&---------------------------------------------------------------------*
+*     Global Variables
+*&---------------------------------------------------------------------*
+DATA gv_arbpl     TYPE iooper-arbpl. " Variable for Resource ID
+DATA gv_gstrs     TYPE co_gstrs.     " variable for Scheduled start
+
+DATA gv_cnf       TYPE flag.
+DATA gv_time      TYPE char10.
+DATA gv_lines     TYPE sy-index.
+DATA gv_pageline  TYPE sy-index.
+DATA gv_interval  TYPE sy-index.
+
+DATA gv_werks     TYPE werks_d.      " Variable for Plant
+
+
+" -----------------------------------------------------------------------
+"       CLASS lcl_report_sel DEFINITION
+" -----------------------------------------------------------------------
+" Selection screen variable definition
+" -----------------------------------------------------------------------
+CLASS lcl_report_sel DEFINITION FINAL.
+  PUBLIC SECTION.
+*&---------------------------------------------------------------------*
+* Variables
+*&---------------------------------------------------------------------*
+
+    DATA lt_arbpl TYPE RANGE OF crhd-arbpl.
+    DATA lt_gstrs TYPE RANGE OF afko-gstrs.
+    DATA lt_werks TYPE RANGE OF afvc-werks.
+
+ENDCLASS.
+
+
+" -----------------------------------------------------------------------
+"       CLASS lcl_report_data DEFINITION
+" -----------------------------------------------------------------------
+" Data fetch and data process
+" -----------------------------------------------------------------------
+CLASS lcl_report_data DEFINITION FINAL.
+  PUBLIC SECTION.
+*&---------------------------------------------------------------------*
+* V A R I A B L E S
+*&---------------------------------------------------------------------*
+    DATA o_sel    TYPE REF TO lcl_report_sel ##NEEDED.
+
+*&---------------------------------------------------------------------*
+* M E T H O D S
+*&---------------------------------------------------------------------*
+    METHODS constructor IMPORTING io_sel TYPE REF TO lcl_report_sel. " Constructor for class
+*      m_check_authorization,          " To check authorization for t-code
+    METHODS get_data.                     " Data selection
+
+ENDCLASS.
+
+
+" ------------------------------------------------------
+" CLASS lcl_handle_events DEFINITION
+" -----------------------------------------------------------------------
+CLASS lcl_handle_events DEFINITION.                         "#EC *
+  PUBLIC SECTION.
+*&---------------------------------------------------------------------*
+* V A R I A B L E S
+*&---------------------------------------------------------------------*
+    DATA o_data   TYPE REF TO lcl_report_data.
+
+*&---------------------------------------------------------------------*
+* C O N S T A N T S
+*&---------------------------------------------------------------------*
+    CONSTANTS lc_aufnr TYPE lvc_fname VALUE 'AUFNR'.
+
+*&---------------------------------------------------------------------*
+* M E T H O D S
+*&---------------------------------------------------------------------*
+    METHODS constructor     IMPORTING io_data TYPE REF TO lcl_report_data.
+    METHODS on_link_click FOR EVENT link_click OF cl_salv_events_table   IMPORTING !row !column.
+    METHODS on_user_command FOR EVENT added_function OF cl_salv_events IMPORTING e_salv_function.
+    METHODS m_refresh.
+
+ENDCLASS.
+
+
+CLASS lcl_receiver DEFINITION.
+  PUBLIC SECTION.
+    METHODS handle_finished FOR EVENT finished OF cl_gui_timer.
+ENDCLASS.
+
+
+" -----------------------------------------------------------------------
+"     CLASS lcl_report_display DEFINITION
+" -----------------------------------------------------------------------
+" Alv output display containing updated tax code values and details
+" -----------------------------------------------------------------------
+CLASS lcl_report_display DEFINITION FINAL.
+  PUBLIC SECTION.
+    " &----------------------------------------------------------------------
+    " C O N S T A N T S
+    " &----------------------------------------------------------------------.
+
+    " Local data declaration for ALV Display
+    DATA lo_grid      TYPE REF TO cl_salv_form_layout_grid.          " for grid declaration
+    DATA lo_text      TYPE REF TO cl_salv_form_text.                 " For text display
+
+    DATA lv_date      TYPE sy-datum.
+
+    DATA lo_label     TYPE REF TO cl_salv_form_label.                " For label description
+    DATA lv_head      TYPE string.                                   " Variable for header
+    DATA lv_time      TYPE char30.
+    DATA lv_msg       TYPE REF TO cx_salv_msg ##NEEDED.              " exception class
+    DATA lo_layout    TYPE REF TO cl_salv_layout.                    " Declaration for layout
+    DATA lo_display   TYPE REF TO cl_salv_display_settings.          " Declaration for display
+    DATA lo_cols      TYPE REF TO cl_salv_columns ##NEEDED.          " Declaration for column
+    DATA lo_cols_tab  TYPE REF TO cl_salv_columns_table.             " Declaration column tab
+    DATA lo_col_tab   TYPE REF TO cl_salv_column_table.              " Declaration column tab
+    DATA lo_functions TYPE REF TO cl_salv_functions_list.            " Function list
+    DATA lwa_key      TYPE salv_s_layout_key.                        " key declaration
+    DATA lo_header    TYPE REF TO cl_salv_form_layout_logo ##NEEDED.
+    DATA o_data       TYPE REF TO lcl_report_data ##NEEDED.
+    DATA lo_alv       TYPE REF TO cl_salv_table.                     " Declaration for ALV object
+    DATA o_sel        TYPE REF TO lcl_report_sel ##NEEDED.
+    DATA lv_name      TYPE char30.                                   " Delcaration for name
+    DATA lv_lines     TYPE i.                                        " Declaration for no line
+
+    DATA lr_events    TYPE REF TO lcl_handle_events.
+    DATA lo_events    TYPE REF TO cl_salv_events_table.              " cl_gui_alv_grid.
+
+    DATA lv_num       TYPE i.
+
+*&---------------------------------------------------------------------*
+*             M E T H O D S
+*&---------------------------------------------------------------------*
+    METHODS constructor IMPORTING io_data TYPE REF TO lcl_report_data  " Constuctor for AlV class
+                                  io_sel  TYPE REF TO lcl_report_sel.
+
+    METHODS generate_alv. " Method to genarate Alv
+ENDCLASS.
+
+
+" -----------------------------------------------------------------------
+" CLASS object declaration
+" -----------------------------------------------------------------------
+
+DATA gr_sel      TYPE REF TO lcl_report_sel ##NEEDED.     " Object for selection
+DATA gr_data     TYPE REF TO lcl_report_data ##NEEDED.    " Object for data retrieval
+DATA gr_alv_disp      TYPE REF TO lcl_report_display ##NEEDED. " Object for Alv display
+
+
+DATA gr_cols_tab TYPE REF TO cl_salv_columns_table.
+DATA gr_alv      TYPE REF TO cl_salv_table.

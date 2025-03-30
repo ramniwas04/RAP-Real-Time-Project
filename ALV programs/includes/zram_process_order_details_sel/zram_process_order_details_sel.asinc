@@ -1,0 +1,24 @@
+*&---------------------------------------------------------------------*
+*& Include zram_process_order_details_sel
+*&---------------------------------------------------------------------*
+
+SELECTION-SCREEN : BEGIN OF BLOCK b1 WITH FRAME TITLE TEXT-001.
+  SELECT-OPTIONS: s_arbpl FOR gv_arbpl ,
+                  s_werks FOR gv_werks ,
+                  s_gstrs FOR gv_gstrs . " Input for scheduled to start
+  PARAMETERS: p_teco     TYPE xfeld,
+              p_intvl(2) TYPE n MODIF ID int DEFAULT 15.
+SELECTION-SCREEN : END OF BLOCK b1 .
+
+
+
+AT SELECTION-SCREEN OUTPUT.
+
+  LOOP AT SCREEN.
+    IF screen-group1 = 'INT'.
+      screen-input     = '0'.
+      screen-invisible = '1'.
+      screen-output    = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.

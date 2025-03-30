@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service defination Process Order'
+define service ZUI_RAM_ProcessOrder {
+  expose ZC_Ram_ProcessOrderDetail;
+}

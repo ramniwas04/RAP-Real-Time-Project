@@ -1,0 +1,76 @@
+@Metadata.layer: #CORE
+@UI: {
+headerInfo: {   typeName: 'Process Order',
+typeNamePlural: 'Process Orders',
+            title: {
+                        type:#STANDARD,
+                        label: 'Process Order',
+                        value : 'aufnr'}
+
+                        }
+}
+annotate view ZC_Ram_ProcessOrderDetail with
+{
+
+  @UI.lineItem: [{ position: 10 }]
+  aufnr;
+  @UI.selectionField: [{ position: 10 }]
+  @UI.lineItem: [{ position: 20 }]
+  WorkCenter;
+  @UI.selectionField: [{ position: 20 }]
+  @UI.lineItem: [{ position: 30 }]
+  Plant;
+  @UI.lineItem: [{ position: 40 }]
+  SupplyArea;
+  @UI.lineItem: [{ position: 50 }]
+  vornr;
+  @UI.lineItem: [{ position: 55 },
+                 { type: #FOR_ACTION,dataAction: 'UpdateCostingVariant',label: 'Update Costing Variant' }]
+  klvari;
+  @UI.lineItem: [{ position: 60 }]
+  arbid;
+  @UI.lineItem: [{ position: 70 }]
+  objnr;
+  @UI.lineItem: [{ position: 80 }]
+  pvzkn;
+  @UI.lineItem: [{ position: 90 }]
+  fsavd;
+  @UI.lineItem: [{ position: 100 }]
+  fsavz;
+  @UI.lineItem: [{ position: 110 }]
+  @UI.selectionField: [{ position: 30 }]
+  gstrs;
+  @UI.lineItem: [{ position: 120 }]
+  gltrs;
+  @UI.lineItem: [{ position: 130 }]
+  rsnum;
+  @UI.lineItem: [{ position: 140 }]
+  gamng;
+  @UI.lineItem: [{ position: 150 }]
+  gmein;
+  @UI.lineItem: [{ position: 160 }]
+  plnbez;
+  @UI.lineItem: [{ position: 170 }]
+  aprio;
+  @UI.lineItem: [{ position: 180 }]
+  gluzs;
+  @UI.lineItem: [{ position: 190 }]
+  gsuzs;
+  @UI.lineItem: [{ position: 200 }]
+  cy_seqnr;
+  @UI.lineItem: [{ position: 210 }]
+  stlal;
+  @UI.lineItem: [{ position: 220 }]
+  matnr;
+  @UI.lineItem: [{ position: 230 }]
+  maktx;
+  @UI.lineItem: [{ position: 240 }]
+  ProductName;
+  @UI.lineItem: [{ position: 250 }]
+  status;
+  @UI.selectionField: [{ position: 40 }]
+  techo_closed;
+  @UI.selectionField: [{ position: 50 }]
+  //    @UI.hidden: true
+  deleted;
+}

@@ -1,0 +1,93 @@
+CLASS zcl_ram_process_order DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    CLASS-METHODS get_status
+        FOR TABLE FUNCTION zr_ram_processorderstatus_tf.
+
+    CLASS-METHODS get_reservation_detail
+        FOR TABLE FUNCTION zr_ram_reservation_tf.
+
+
+    INTERFACES if_amdp_marker_hdb .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_ram_process_order IMPLEMENTATION.
+  METHOD get_reservation_detail BY DATABASE FUNCTION
+                           FOR HDB
+                           LANGUAGE SQLSCRIPT
+                            OPTIONS READ-ONLY
+                            USING resb makt.
+
+    declare lv_lang  "$ABAP.type( spras )" ;
+    declare lv_mandt  "$ABAP.type( mandt )" ;
+
+      lv_lang  = session_context(  'LOCALE_SAP' ) ;
+      lv_mandt  = session_context(  'CDS_CLIENT' ) ;
+
+    return
+     select mandt,
+            rsnum,
+            matnr,
+            maktx
+       from (
+        select a.mandt,
+                a.rsnum,
+                a.matnr,
+                b.maktx,
+                ROW_NUMBER ( )
+                 OVER( PARTITION by  a.rsnum  order by a.bdmng desc ) as row_num
+           from resb as a
+            left outer join makt as b
+                 on a.mandt = b.mandt
+                  and a.matnr = b.matnr
+                  and b.spras = :lv_lang
+           where a.mandt = :lv_mandt
+           and a.bdmng is not null
+           order by rsnum asc
+
+           ) as sub
+        where sub.row_num = 1;
+
+
+
+  ENDMETHOD.
+  METHOD get_status BY DATABASE FUNCTION
+                   FOR HDB
+                   LANGUAGE SQLSCRIPT
+                   OPTIONS READ-ONLY
+                   USING jest tj02t.
+    declare lv_client "$ABAP.type( mandt )";
+    declare lv_lang "$ABAP.type( spras )";
+
+    lv_client := session_context('CLIENT');
+    lv_lang   := session_context('LOCALE_SAP');
+
+   RETURN  SELECT   a.mandt,
+                    a.objnr,
+                    STRING_AGG(b.txt30, ', ' ORDER BY b.txt30 desc ) as status,
+                    MAX(CASE when a.stat in ('I0045', 'I0046') then 'X' else '' end) AS techo_closed,
+                    MAX(CASE when a.stat in ('I0076' ) then 'X' else '' end) AS deleted
+            from jest as a
+            left outer join tj02t as b
+            ON  a.mandt = :lv_client
+            and a.stat = b.istat
+            and b.spras = lv_lang
+            WHERE a.mandt = :lv_client
+            and a.stat in ( 'I0001', 'I0002', 'I0004',
+                            'I0010', 'I0012',
+                            'I0045', 'I0046', 'I0076',
+                            'I0241', 'I0340',
+                            'I0267', 'I0074', 'I0055',
+                            'I0007', 'I0008')
+            and a.inact <> 'X'
+            group by a.mandt, a.objnr;
+
+  endmethod.
+ENDCLASS.

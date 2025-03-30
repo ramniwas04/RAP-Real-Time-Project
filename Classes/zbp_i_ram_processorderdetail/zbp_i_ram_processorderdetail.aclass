@@ -1,0 +1,5 @@
+CLASS zbp_i_ram_processorderdetail DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zi_ram_processorderdetail.
+ENDCLASS.
+
+CLASS zbp_i_ram_processorderdetail IMPLEMENTATION.
+ENDCLASS.

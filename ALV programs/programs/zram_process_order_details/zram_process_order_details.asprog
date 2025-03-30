@@ -1,0 +1,30 @@
+*&---------------------------------------------------------------------*
+*& Report ZRAM_PROCESS_ORDER_DETAILS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zram_process_order_details.
+
+INCLUDE zram_process_order_details_top.
+
+INCLUDE zram_process_order_details_sel.
+
+INCLUDE zram_process_order_details_sub.
+
+INITIALIZATION.
+  " Create objects for local classes
+  gr_sel = NEW #( ).     " Selection screen
+  gr_data = NEW #( gr_sel ).
+  gr_alv_disp = NEW #( io_data = gr_data
+                       io_sel  = gr_sel ). " Selection screen
+
+
+START-OF-SELECTION.
+* Move Selection screen values to Selection class
+  PERFORM f_set_selection.
+* To fetch data from tables
+  gr_data->get_data( ).
+
+END-OF-SELECTION.
+* Call the DISPLAY method to get the output on the screen
+  gr_alv_disp->generate_alv( ).

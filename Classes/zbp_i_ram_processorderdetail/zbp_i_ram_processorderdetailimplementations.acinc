@@ -1,0 +1,67 @@
+CLASS lhc_zi_ram_processorderdetail DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS get_authorizations FOR AUTHORIZATION
+      IMPORTING keys REQUEST requested_authorizations FOR zi_ram_processorderdetail RESULT result.
+
+    METHODS updatecostingvariant FOR MODIFY
+      IMPORTING keys FOR ACTION zi_ram_processorderdetail~updatecostingvariant RESULT result.
+
+ENDCLASS.
+
+CLASS lhc_zi_ram_processorderdetail IMPLEMENTATION.
+
+  METHOD get_authorizations.
+  ENDMETHOD.
+
+  METHOD updatecostingvariant.
+    MODIFY ENTITIES OF zi_ram_processorderdetail IN LOCAL MODE
+        ENTITY zi_ram_processorderdetail
+        UPDATE FIELDS ( klvari )
+        WITH VALUE #( FOR ls_key IN keys ( %tky = ls_key-%tky
+                                           klvari = ls_key-%param-klvari  ) ).
+    "Read changed data for action result
+    READ ENTITIES OF zi_ram_processorderdetail IN LOCAL MODE
+      ENTITY zi_ram_processorderdetail
+        ALL FIELDS WITH
+        CORRESPONDING #( keys )
+      RESULT DATA(lt_processorders).
+
+    result = VALUE #( FOR ls_processorder IN lt_processorders ( %tky   = ls_processorder-%tky
+                                                                %param = ls_processorder ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lsc_zi_ram_processorderdetail DEFINITION INHERITING FROM cl_abap_behavior_saver.
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_zi_ram_processorderdetail IMPLEMENTATION.
+
+  METHOD save_modified.
+    DATA lt_afko TYPE STANDARD TABLE OF afko.
+    IF update-zi_ram_processorderdetail IS NOT INITIAL.
+      DATA(lt_record) = update-zi_ram_processorderdetail.
+      DELETE lt_record WHERE %control-klvari = if_abap_behv=>mk-off.
+      SELECT * FROM afko
+        FOR ALL ENTRIES IN @lt_record
+        WHERE aufnr = @lt_record-aufnr
+        INTO TABLE @lt_afko.
+      IF sy-subrc IS INITIAL.
+
+        LOOP AT lt_afko ASSIGNING FIELD-SYMBOL(<ls_afko>).
+          <ls_afko>-klvari = VALUE #( update-zi_ram_processorderdetail[ aufnr = <ls_afko>-aufnr ]-klvari OPTIONAL ).
+        ENDLOOP.
+        UPDATE afko FROM TABLE lt_afko.
+      ENDIF.
+
+    ENDIF.
+
+  ENDMETHOD.
+
+ENDCLASS.
